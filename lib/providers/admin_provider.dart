@@ -12,11 +12,13 @@ class AdminProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // Create an employee
   Future<void> createEmployee({
     required String name,
     required String email,
     required String password,
+    required String designation,
+    required double salary,
+    required String phoneNumber,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -26,18 +28,68 @@ class AdminProvider with ChangeNotifier {
       name: name,
       email: email,
       password: password,
+      designation: designation,
+      salary: salary,
+      phoneNumber: phoneNumber,
     );
 
     _isLoading = false;
     if (error != null) {
       _errorMessage = error;
     } else {
-      await fetchEmployees(); // Refresh employee list
+      await fetchEmployees();
     }
     notifyListeners();
   }
 
-  // Fetch employees
+  Future<void> updateEmployee({
+    required String uid,
+    required String name,
+    required String email,
+    required String role,
+    required String designation,
+    required double salary,
+    required String phoneNumber,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final error = await _adminService.updateEmployee(
+      uid: uid,
+      name: name,
+      email: email,
+      role: role,
+      designation: designation,
+      salary: salary,
+      phoneNumber: phoneNumber,
+    );
+
+    _isLoading = false;
+    if (error != null) {
+      _errorMessage = error;
+    } else {
+      await fetchEmployees();
+    }
+    notifyListeners();
+  }
+
+  Future<void> deleteEmployee(String uid) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final error = await _adminService.deleteEmployee(uid);
+
+    _isLoading = false;
+    if (error != null) {
+      _errorMessage = error;
+    } else {
+      await fetchEmployees();
+    }
+    notifyListeners();
+  }
+
   Future<void> fetchEmployees() async {
     _isLoading = true;
     _errorMessage = null;
@@ -53,7 +105,6 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Sign out
   Future<void> signOut() async {
     await _adminService.signOut();
     _employees = [];
